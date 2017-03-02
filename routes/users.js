@@ -18,12 +18,12 @@ function createToken(user) {
   return jwt.sign(_.omit(user, 'password'), config.secretKey, { expiresIn: 60*60*5 });
 }
 function getUserDB(username, done) {
-  db.get().query('SELECT * FROM users WHERE username = ? LIMIT 1', [username], function(err, rows, fields) {
+  db.get().query('SELECT * FROM gcm_users WHERE username = ? LIMIT 1', [username], function(err, rows, fields) {
     if (err) throw err;
     done(rows[0]);
   });
 }
-app.post('/user/create', function(req, res) {  
+app.post('/api/user/create', function(req, res) {  
   if (!req.body.username || !req.body.password) {
     return res.status(400).send("You must send the username and the password");
   }
@@ -34,7 +34,7 @@ app.post('/user/create', function(req, res) {
         password: req.body.password,
         email: req.body.email
       };
-      db.get().query('INSERT INTO users SET ?', [user], function(err, result){
+      db.get().query('INSERT INTO gcm_users SET ?', [user], function(err, result){
         if (err) throw err;
         newUser = {
           id: result.insertId,
@@ -50,7 +50,7 @@ app.post('/user/create', function(req, res) {
     else res.status(400).send("A user with that username already exists");
   });
 });
-app.post('/user/login', function(req, res) {
+app.post('/api/user/login', function(req, res) {
   if (!req.body.username || !req.body.password) {
     return res.status(400).send("You must send the username and the password");
   }
