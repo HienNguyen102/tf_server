@@ -72,8 +72,10 @@ app.post('/api/user/login', function(req, res) {
     if (user.password !== req.body.password) {
       return res.status(401).send("The username or password don't match");
     }
-    res.status(201).send({
-      id_token: createToken(user)
+    res.status(200).send({
+      id: user.id,
+      id_token: createToken(user),
+      username: user.username
     });
   });
 });
@@ -90,7 +92,6 @@ app.get('/user/check/:username', function(req, res) {
 app.use('/api/user/get_users', jwtCheck);
 
 app.get('/api/user/get_users/:user_id', function(req, res) {
-  console.log(req.params.user_id);
   if (!req.params.user_id) {
     return res.status(400).send("You must send a user id");
   }
