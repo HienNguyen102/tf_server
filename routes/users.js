@@ -74,6 +74,7 @@ app.post('/api/user/login', function(req, res) {
     }
     res.status(200).send({
       id: user.id,
+      socket_id: user.socket_id,
       id_token: createToken(user),
       username: user.username
     });

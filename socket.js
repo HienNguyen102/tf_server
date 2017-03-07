@@ -6,11 +6,11 @@ exports.connect = function(server){
     function updateUserInDB(user_id, socketId ,is_online, done){
         var strQuery = "UPDATE gcm_users SET isOnline = ";
         if (is_online){
-            strQuery += "1, ";
+            strQuery += "1, socket_id = '" + socketId + "'";
         }else{
-            strQuery += "0, ";
+            strQuery += "0, socket_id = ''";
         }
-        strQuery += "socket_id = '"+socketId+"' WHERE id = " + user_id;
+        strQuery += " WHERE id = " + user_id;
         db.get().query(strQuery, function(err, rows){
             if (err) throw err;
             done(rows);
@@ -18,7 +18,7 @@ exports.connect = function(server){
     }
     //When disconnect
     function updateUserInDBWhenDisconnect(socketId, done){
-        var strQuery = "UPDATE gcm_users SET isOnline = 0 WHERE socket_id = '" + socketId +"'";
+        var strQuery = "UPDATE gcm_users SET isOnline = 0, socket_id = '' WHERE socket_id = '" + socketId +"'";
         db.get().query(strQuery, function(err, rows){
             if (err) throw err;
             done(rows);
@@ -52,6 +52,9 @@ exports.connect = function(server){
             io.emit("userTypingUpdate", typingUsers);*/
             updateUserInDBWhenDisconnect(clientSocket.id, function(result){
                 console.log("update success when disconnect");
+                getAllUsersInDB(function(resultSelect){
+                    io.emit("userList", resultSelect);
+                });
             });
         });
 
@@ -66,7 +69,7 @@ exports.connect = function(server){
             }
             }
             io.emit("userExitUpdate", clientNickname);*/
-            updateUserInDB(clientId, clientSocket.id, false, function(result){
+            updateUserInDB(clientId, "", false, function(result){
                 getAllUsersInDB(function(resultSelect){
                     io.emit("userList", resultSelect);
                 });
@@ -112,6 +115,14 @@ exports.connect = function(server){
                     io.emit("userList", resultSelect);
                 });
             });
+        });
+        clientSocket.on("twoPeopleStartType", function(senderNick, receiverId, receiverSocketId){
+            console.log("User " + senderNick + " is writing a message to id: "+ receiverId +" Socket id: "+receiverSocketId);
+            //io.emit("userTypingInConUpdate", typingUsers);
+            if (io.sockets.connected[receiverSocketId]) {
+                io.sockets.connected[receiverSocketId].emit('twoPeopleTypingUpdate', 'for '+receiverSocketId+' only');
+            }
+            //io.emit("twoPeopleTypingUpdate", "chao moi nguoi");
         });
 
 
