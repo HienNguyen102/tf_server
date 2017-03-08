@@ -33,6 +33,7 @@ exports.connect = function(server){
 
     io.on('connection', function(clientSocket) {
         console.log('user '+clientSocket.id+' connected');
+        clientSocket.emit("clientId", clientSocket.id);
 
         clientSocket.on('disconnect', function(){
             console.log('user '+clientSocket.id+' disconnected');
