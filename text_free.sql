@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.1
+-- version 4.5.2
 -- http://www.phpmyadmin.net
 --
--- Host: 127.0.0.1
--- Generation Time: Mar 02, 2017 at 11:05 AM
+-- Host: localhost
+-- Generation Time: Mar 10, 2017 at 05:46 AM
 -- Server version: 10.1.19-MariaDB
 -- PHP Version: 5.6.28
 
@@ -77,30 +77,6 @@ INSERT INTO `friends` (`friend_one`, `friend_two`) VALUES
 (182, 181),
 (182, 185),
 (186, 181);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `gcm_users`
---
-
-CREATE TABLE `gcm_users` (
-  `id` int(11) NOT NULL,
-  `gcm_regid` text,
-  `name` varchar(50) NOT NULL,
-  `username` varchar(200) NOT NULL,
-  `password` varchar(20) NOT NULL,
-  `email` varchar(200) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `gcm_users`
---
-
-INSERT INTO `gcm_users` (`id`, `gcm_regid`, `name`, `username`, `password`, `email`, `created_at`) VALUES
-(194, NULL, '', 'hien1', '123', 'hie1n@gmail.com', '2017-03-02 08:36:04'),
-(195, NULL, '', 'hien2', '123', 'hien2@gmail.com', '2017-03-02 09:48:55');
 
 -- --------------------------------------------------------
 
@@ -200,6 +176,113 @@ INSERT INTO `group_reply` (`id`, `g_id`, `u_id`, `reply`, `time`) VALUES
 (132, 39, 181, 'okay roi day', 1433126262),
 (133, 39, 181, 'chat nhom day', 1433146852);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `logged_in_user`
+--
+
+CREATE TABLE `logged_in_user` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `room_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Dumping data for table `logged_in_user`
+--
+
+INSERT INTO `logged_in_user` (`id`, `user_id`, `room_id`) VALUES
+(6, 194, 2),
+(7, 195, 2),
+(8, 196, 2),
+(9, 194, 2),
+(10, 195, 2),
+(11, 196, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `message`
+--
+
+CREATE TABLE `message` (
+  `id` int(11) NOT NULL,
+  `room_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `to_user_id` int(11) NOT NULL,
+  `text` text COLLATE utf8_bin NOT NULL,
+  `time_stamp` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `quotes`
+--
+
+CREATE TABLE `quotes` (
+  `id` int(11) NOT NULL,
+  `content` varchar(150) NOT NULL,
+  `private` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `quotes`
+--
+
+INSERT INTO `quotes` (`id`, `content`, `private`) VALUES
+(1, 'private 1', 1),
+(2, 'public 1', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `room`
+--
+
+CREATE TABLE `room` (
+  `id` int(11) NOT NULL,
+  `name` varchar(300) COLLATE utf8_bin NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Dumping data for table `room`
+--
+
+INSERT INTO `room` (`id`, `name`) VALUES
+(1, 'r1'),
+(2, 'r2');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user`
+--
+
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL,
+  `socket_id` varchar(100) DEFAULT NULL,
+  `name` varchar(50) NOT NULL,
+  `username` varchar(200) NOT NULL,
+  `password` varchar(20) NOT NULL,
+  `email` varchar(200) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `isOnline` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id`, `socket_id`, `name`, `username`, `password`, `email`, `created_at`, `isOnline`) VALUES
+(194, '', '', 'hienAndroid', '123', 'hienAndroid@gmail.com', '2017-03-02 08:36:04', 0),
+(195, 'NcJ9BcLTo-nwEJ1SAAAS', '', 'hienAndroid2', '123', 'hien2@gmail.com', '2017-03-02 09:48:55', 1),
+(196, '', '', 'gonto', 'gonto', 'gongo@gmail.com', '2017-03-02 13:56:15', 0),
+(197, NULL, '', 'hien3', '123', 'hien3@gmail.com', '2017-03-04 11:28:10', 0),
+(198, NULL, '', 'hien4', '124', 'hien4@gmail.com', '2017-03-04 11:30:02', 0),
+(199, NULL, '', 'hien5', '123', 'hien4@gmail.com', '2017-03-09 16:23:31', 0);
+
 --
 -- Indexes for dumped tables
 --
@@ -227,12 +310,6 @@ ALTER TABLE `friends`
   ADD PRIMARY KEY (`friend_one`,`friend_two`);
 
 --
--- Indexes for table `gcm_users`
---
-ALTER TABLE `gcm_users`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `group`
 --
 ALTER TABLE `group`
@@ -251,6 +328,40 @@ ALTER TABLE `group_reply`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `logged_in_user`
+--
+ALTER TABLE `logged_in_user`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_us_id` (`user_id`),
+  ADD KEY `fk_room_id` (`room_id`);
+
+--
+-- Indexes for table `message`
+--
+ALTER TABLE `message`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_user_message` (`user_id`),
+  ADD KEY `fk_room_message` (`room_id`);
+
+--
+-- Indexes for table `quotes`
+--
+ALTER TABLE `quotes`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `room`
+--
+ALTER TABLE `room`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -263,12 +374,7 @@ ALTER TABLE `conversation`
 -- AUTO_INCREMENT for table `conversation_reply`
 --
 ALTER TABLE `conversation_reply`
-  MODIFY `cr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=324;
---
--- AUTO_INCREMENT for table `gcm_users`
---
-ALTER TABLE `gcm_users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=196;
+  MODIFY `cr_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `group`
 --
@@ -285,6 +391,31 @@ ALTER TABLE `group_logged_user`
 ALTER TABLE `group_reply`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134;
 --
+-- AUTO_INCREMENT for table `logged_in_user`
+--
+ALTER TABLE `logged_in_user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+--
+-- AUTO_INCREMENT for table `message`
+--
+ALTER TABLE `message`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `quotes`
+--
+ALTER TABLE `quotes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT for table `room`
+--
+ALTER TABLE `room`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=200;
+--
 -- Constraints for dumped tables
 --
 
@@ -292,15 +423,29 @@ ALTER TABLE `group_reply`
 -- Constraints for table `conversation`
 --
 ALTER TABLE `conversation`
-  ADD CONSTRAINT `fk_user_one_id` FOREIGN KEY (`user_one`) REFERENCES `gcm_users` (`id`),
-  ADD CONSTRAINT `fk_user_two_id` FOREIGN KEY (`user_two`) REFERENCES `gcm_users` (`id`);
+  ADD CONSTRAINT `fk_user_one_id` FOREIGN KEY (`user_one`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `fk_user_two_id` FOREIGN KEY (`user_two`) REFERENCES `user` (`id`);
 
 --
 -- Constraints for table `conversation_reply`
 --
 ALTER TABLE `conversation_reply`
   ADD CONSTRAINT `fk_c_id` FOREIGN KEY (`c_id_fk`) REFERENCES `conversation` (`c_id`),
-  ADD CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id_fk`) REFERENCES `gcm_users` (`id`);
+  ADD CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id_fk`) REFERENCES `user` (`id`);
+
+--
+-- Constraints for table `logged_in_user`
+--
+ALTER TABLE `logged_in_user`
+  ADD CONSTRAINT `fk_room_id` FOREIGN KEY (`room_id`) REFERENCES `room` (`id`),
+  ADD CONSTRAINT `fk_us_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+--
+-- Constraints for table `message`
+--
+ALTER TABLE `message`
+  ADD CONSTRAINT `fk_room_message` FOREIGN KEY (`room_id`) REFERENCES `room` (`id`),
+  ADD CONSTRAINT `fk_user_message` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -9,6 +9,7 @@ var cors = require('cors'); //after the line var bodyParser = require('body-pars
 var index = require('./routes/index');
 var users = require('./routes/users');
 var conversations = require('./routes/conversations');
+var chat = require('./routes/chat');
 
 var app = express();
 
@@ -32,6 +33,7 @@ app.use('/', index);
 //app.use('/users', users);
 app.use(users);
 app.use(conversations);
+app.use(chat);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

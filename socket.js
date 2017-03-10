@@ -4,7 +4,7 @@ exports.connect = function(server){
     var userList = [];
     var typingUsers = [];
     function updateUserInDB(user_id, socketId ,is_online, done){
-        var strQuery = "UPDATE gcm_users SET isOnline = ";
+        var strQuery = "UPDATE user SET isOnline = ";
         if (is_online){
             strQuery += "1, socket_id = '" + socketId + "'";
         }else{
@@ -18,14 +18,14 @@ exports.connect = function(server){
     }
     //When disconnect
     function updateUserInDBWhenDisconnect(socketId, done){
-        var strQuery = "UPDATE gcm_users SET isOnline = 0, socket_id = '' WHERE socket_id = '" + socketId +"'";
+        var strQuery = "UPDATE user SET isOnline = 0, socket_id = '' WHERE socket_id = '" + socketId +"'";
         db.get().query(strQuery, function(err, rows){
             if (err) throw err;
             done(rows);
         });
     }
     function getAllUsersInDB(done){
-        db.get().query('SELECT * FROM gcm_users', function(err, rows) {
+        db.get().query('SELECT * FROM user', function(err, rows) {
             if (err) throw err;
             done(rows);
         });

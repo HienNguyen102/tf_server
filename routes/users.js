@@ -22,14 +22,14 @@ var jwtCheck = express_jwt({
   secret: config.secretKey
 });
 function getUserDB(username, done) {
-  db.get().query('SELECT * FROM gcm_users WHERE username = ? LIMIT 1', [username], function(err, rows, fields) {
+  db.get().query('SELECT * FROM user WHERE username = ? LIMIT 1', [username], function(err, rows, fields) {
     if (err) throw err;
     done(rows[0]);
   });
 }
 function getUsersDB(user_id, done){
   //console.log(user_id);
-    db.get().query('SELECT * FROM gcm_users WHERE NOT (id = ?)', user_id, function(err, rows) {
+    db.get().query('SELECT * FROM user WHERE NOT (id = ?)', user_id, function(err, rows) {
         if (err) throw err;
         done(rows);
     });
@@ -45,7 +45,7 @@ app.post('/api/user/create', function(req, res) {
         password: req.body.password,
         email: req.body.email
       };
-      db.get().query('INSERT INTO gcm_users SET ?', [user], function(err, result){
+      db.get().query('INSERT INTO user SET ?', [user], function(err, result){
         if (err) throw err;
         newUser = {
           id: result.insertId,
