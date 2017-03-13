@@ -117,13 +117,20 @@ exports.connect = function(server){
                 });
             });
         });
-        clientSocket.on("twoPeopleStartType", function(senderNick, receiverId, receiverSocketId){
+        clientSocket.on("typing", function(senderNick, receiverId, receiverSocketId){
             console.log("User " + senderNick + " is writing a message to id: "+ receiverId +" Socket id: "+receiverSocketId);
             //io.emit("userTypingInConUpdate", typingUsers);
             if (io.sockets.connected[receiverSocketId]) {
-                io.sockets.connected[receiverSocketId].emit('twoPeopleTypingUpdate', 'for '+receiverSocketId+' only');
+                io.sockets.connected[receiverSocketId].emit('typing', senderNick + 'is typing');
             }
             //io.emit("twoPeopleTypingUpdate", "chao moi nguoi");
+        });
+
+        clientSocket.on("stopTyping", function(senderNick, receiverId, receiverSocketId){
+            console.log("User " + senderNick + " is stop typing a message to id: "+ receiverId +" Socket id: "+receiverSocketId);
+            if (io.sockets.connected[receiverSocketId]) {
+                io.sockets.connected[receiverSocketId].emit('stopTyping',  senderNick + 'is stop typing');
+            }
         });
 
 
