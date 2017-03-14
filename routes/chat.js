@@ -15,6 +15,25 @@ function getConversationReplyDB(c_id, done) {
     done(rows);
   });
 }
+function getRoomId(user_one, user_two, done){
+  db.get().query('SELECT room_id FROM logged_in_user WHERE user_id = ?', [user_one], function(err, rows1, fields){
+    if (err) throw err;
+    //done(rows1);
+    for (i = 0; i < rows1.length; i++) {
+      db.get().query('SELECT room_id FROM logged_in_user WHERE room_id = ? AND user_id = ?', [rows1[i].room_id,user_two], function(err, rows2){
+        if (err) throw err;
+        if(rows2.length>0){
+          db.get().query('SELECT room_id FROM logged_in_user WHERE room_id = ?', [rows2[0].room_id], function(err, rows3){
+            if (err) throw err;
+            if(rows3.length==2){
+              done(rows3[0]);
+            }
+          });
+        }
+      });
+    }
+  });
+}
 function getRoom(room_id, done){
     db.get().query('SELECT * FROM room WHERE id = ? LIMIT 1', [room_id], function(err, rows, fields){
         if (err) throw err;
@@ -98,5 +117,10 @@ app.get('/api/chat/get_messages/:room_id', function(req, res) {
   }
   getAllMessages(req.params.room_id ,function(result) {
       res.status(200).send(result);
+  });
+});
+app.get('/api/chat/get_room/:user_one/:user_two', function(req, res){
+  getRoomId(req.params.user_one, req.params.user_two, function(result){
+    res.status(200).send(result);
   });
 });
