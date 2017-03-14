@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Mar 10, 2017 at 05:46 AM
+-- Generation Time: Mar 14, 2017 at 05:40 PM
 -- Server version: 10.1.19-MariaDB
 -- PHP Version: 5.6.28
 
@@ -193,12 +193,21 @@ CREATE TABLE `logged_in_user` (
 --
 
 INSERT INTO `logged_in_user` (`id`, `user_id`, `room_id`) VALUES
-(6, 194, 2),
-(7, 195, 2),
-(8, 196, 2),
-(9, 194, 2),
-(10, 195, 2),
-(11, 196, 2);
+(12, 194, 5),
+(13, 195, 5),
+(14, 194, 6),
+(15, 196, 6),
+(18, 194, 8),
+(19, 198, 8),
+(20, 194, 9),
+(21, 199, 9),
+(22, 194, 10),
+(23, 197, 10),
+(24, 195, 11),
+(25, 196, 11),
+(26, 195, 12),
+(27, 196, 12),
+(28, 194, 12);
 
 -- --------------------------------------------------------
 
@@ -212,28 +221,38 @@ CREATE TABLE `message` (
   `user_id` int(11) NOT NULL,
   `to_user_id` int(11) NOT NULL,
   `text` text COLLATE utf8_bin NOT NULL,
-  `time_stamp` int(11) NOT NULL
+  `time_stamp` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `quotes`
+-- Dumping data for table `message`
 --
 
-CREATE TABLE `quotes` (
-  `id` int(11) NOT NULL,
-  `content` varchar(150) NOT NULL,
-  `private` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `quotes`
---
-
-INSERT INTO `quotes` (`id`, `content`, `private`) VALUES
-(1, 'private 1', 1),
-(2, 'public 1', 0);
+INSERT INTO `message` (`id`, `room_id`, `user_id`, `to_user_id`, `text`, `time_stamp`) VALUES
+(3, 5, 194, 195, 'Helo 195', 2147483647),
+(4, 5, 195, 194, 'Helo 194', 2147483647),
+(5, 6, 194, 196, 'Helo 196', 2147483647),
+(6, 8, 194, 198, 'Helo 198', 2147483647),
+(7, 8, 198, 194, 'Helo 194', 2147483647),
+(8, 8, 198, 194, 'Ban dang lam gi 194', 2147483647),
+(9, 9, 194, 199, 'Chao 199', 2147483647),
+(10, 6, 196, 194, 'Chao 194', 2147483647),
+(11, 10, 194, 197, 'Chao 197', 2147483647),
+(12, 9, 194, 199, '199 Dang lam gi day', 2147483647),
+(13, 9, 194, 199, '199 Ne', 2147483647),
+(14, 11, 195, 196, 'Hi 196', 2147483647),
+(15, 11, 195, 196, 'Hi hi 196', 2147483647),
+(16, 12, 195, 197, 'Hi 197', 1489245873639),
+(17, 12, 195, 197, '197 Ne', 1489245928696),
+(18, 12, 197, 195, 'Chao em 195', 1489293810587),
+(19, 6, 196, 194, 'chu 96 dang lam gi', 1489306974593),
+(20, 6, 196, 194, 'ưng hoàng phục', 1489307021190),
+(21, 6, 194, 196, 'jj', 1489315142292),
+(22, 6, 194, 196, 'chao', 1489317203042),
+(23, 6, 194, 196, 'ai mua trang', 1489317233090),
+(24, 6, 194, 196, 'hi', 1489318038680),
+(25, 6, 194, 196, 'Hola', 1489318124433),
+(26, 6, 194, 196, 'Hola2', 1489318349913);
 
 -- --------------------------------------------------------
 
@@ -243,16 +262,23 @@ INSERT INTO `quotes` (`id`, `content`, `private`) VALUES
 
 CREATE TABLE `room` (
   `id` int(11) NOT NULL,
-  `name` varchar(300) COLLATE utf8_bin NOT NULL
+  `name` varchar(300) COLLATE utf8_bin NOT NULL,
+  `latest_message` text COLLATE utf8_bin NOT NULL,
+  `latest_time` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
 -- Dumping data for table `room`
 --
 
-INSERT INTO `room` (`id`, `name`) VALUES
-(1, 'r1'),
-(2, 'r2');
+INSERT INTO `room` (`id`, `name`, `latest_message`, `latest_time`) VALUES
+(5, '194_195', 'Helo 194', 0),
+(6, '194_196', 'Hola2', 1489318349913),
+(8, '194_198', 'Ban dang lam gi 194', 0),
+(9, '194_199', '197 Ne', 2147483647),
+(10, '194_197', 'Chao 197', 2147483647),
+(11, '195_196', 'Hi hi 196', 1489245735335),
+(12, '195_197', 'Chao em 195', 1489293810587);
 
 -- --------------------------------------------------------
 
@@ -276,8 +302,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `socket_id`, `name`, `username`, `password`, `email`, `created_at`, `isOnline`) VALUES
-(194, '', '', 'hienAndroid', '123', 'hienAndroid@gmail.com', '2017-03-02 08:36:04', 0),
-(195, 'NcJ9BcLTo-nwEJ1SAAAS', '', 'hienAndroid2', '123', 'hien2@gmail.com', '2017-03-02 09:48:55', 1),
+(194, 'Qr34kFctNxKPSiE-AAAG', '', 'hienAndroid', '123', 'hienAndroid@gmail.com', '2017-03-02 08:36:04', 1),
+(195, 'NcJ9BcLTo-nwEJ1SAAAS', '', 'hienAndroid2', '123', 'hien2@gmail.com', '2017-03-02 09:48:55', 0),
 (196, '', '', 'gonto', 'gonto', 'gongo@gmail.com', '2017-03-02 13:56:15', 0),
 (197, NULL, '', 'hien3', '123', 'hien3@gmail.com', '2017-03-04 11:28:10', 0),
 (198, NULL, '', 'hien4', '124', 'hien4@gmail.com', '2017-03-04 11:30:02', 0),
@@ -344,12 +370,6 @@ ALTER TABLE `message`
   ADD KEY `fk_room_message` (`room_id`);
 
 --
--- Indexes for table `quotes`
---
-ALTER TABLE `quotes`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `room`
 --
 ALTER TABLE `room`
@@ -394,22 +414,17 @@ ALTER TABLE `group_reply`
 -- AUTO_INCREMENT for table `logged_in_user`
 --
 ALTER TABLE `logged_in_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 --
 -- AUTO_INCREMENT for table `message`
 --
 ALTER TABLE `message`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT for table `quotes`
---
-ALTER TABLE `quotes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 --
 -- AUTO_INCREMENT for table `room`
 --
 ALTER TABLE `room`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- AUTO_INCREMENT for table `user`
 --
