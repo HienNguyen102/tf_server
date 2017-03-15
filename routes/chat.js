@@ -16,7 +16,7 @@ function getConversationReplyDB(c_id, done) {
   });
 }
 function getRoomId(user_one, user_two, done){
-  db.get().query('SELECT room_id FROM logged_in_user WHERE user_id = ?', [user_one], function(err, rows1, fields){
+  /*db.get().query('SELECT room_id FROM logged_in_user WHERE user_id = ?', [user_one], function(err, rows1, fields){
     if (err) throw err;
     //done(rows1);
     for (i = 0; i < rows1.length; i++) {
@@ -32,6 +32,10 @@ function getRoomId(user_one, user_two, done){
         }
       });
     }
+  });*/
+  db.get().query('SELECT * FROM logged_in_user WHERE user_id = ? AND room_id IN(SELECT room_id FROM logged_in_user WHERE user_id = ?) AND room_id IN(select room_id from logged_in_user group by room_id HAVING count(room_id)=2)', [user_one, user_two], function(err, rows, fields){
+    if(err) throw err;
+    done(rows);
   });
 }
 function getRoom(room_id, done){
