@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.2
+-- version 4.5.1
 -- http://www.phpmyadmin.net
 --
--- Host: localhost
--- Generation Time: Mar 14, 2017 at 05:40 PM
+-- Host: 127.0.0.1
+-- Generation Time: Mar 18, 2017 at 05:24 AM
 -- Server version: 10.1.19-MariaDB
 -- PHP Version: 5.6.28
 
@@ -19,6 +19,14 @@ SET time_zone = "+00:00";
 --
 -- Database: `text_free`
 --
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ProG` (IN `user_id` INT(11))  SELECT * FROM `user` WHERE id = user_id$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -207,7 +215,10 @@ INSERT INTO `logged_in_user` (`id`, `user_id`, `room_id`) VALUES
 (25, 196, 11),
 (26, 195, 12),
 (27, 196, 12),
-(28, 194, 12);
+(28, 194, 12),
+(31, 194, 15),
+(32, 195, 15),
+(33, 197, 15);
 
 -- --------------------------------------------------------
 
@@ -263,6 +274,7 @@ INSERT INTO `message` (`id`, `room_id`, `user_id`, `to_user_id`, `text`, `time_s
 CREATE TABLE `room` (
   `id` int(11) NOT NULL,
   `name` varchar(300) COLLATE utf8_bin NOT NULL,
+  `created_by` int(11) NOT NULL,
   `latest_message` text COLLATE utf8_bin NOT NULL,
   `latest_time` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -271,14 +283,15 @@ CREATE TABLE `room` (
 -- Dumping data for table `room`
 --
 
-INSERT INTO `room` (`id`, `name`, `latest_message`, `latest_time`) VALUES
-(5, '194_195', 'Helo 194', 0),
-(6, '194_196', 'Hola2', 1489318349913),
-(8, '194_198', 'Ban dang lam gi 194', 0),
-(9, '194_199', '197 Ne', 2147483647),
-(10, '194_197', 'Chao 197', 2147483647),
-(11, '195_196', 'Hi hi 196', 1489245735335),
-(12, '195_197', 'Chao em 195', 1489293810587);
+INSERT INTO `room` (`id`, `name`, `created_by`, `latest_message`, `latest_time`) VALUES
+(5, '194_195', 194, 'Helo 194', 0),
+(6, '194_196', 194, 'Hola2', 1489318349913),
+(8, '194_198', 194, 'Ban dang lam gi 194', 0),
+(9, '194_199', 194, '197 Ne', 2147483647),
+(10, '194_197', 194, 'Chao 197', 2147483647),
+(11, '195_196', 195, 'Hi hi 196', 1489245735335),
+(12, '195_197', 195, 'Chao em 195', 1489293810587),
+(15, 'room nhau chieu thu 7', 194, '195 change group name to room nhau chieu thu 7', 1489810206152);
 
 -- --------------------------------------------------------
 
@@ -373,7 +386,8 @@ ALTER TABLE `message`
 -- Indexes for table `room`
 --
 ALTER TABLE `room`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_user_id_created_room` (`created_by`);
 
 --
 -- Indexes for table `user`
@@ -414,7 +428,7 @@ ALTER TABLE `group_reply`
 -- AUTO_INCREMENT for table `logged_in_user`
 --
 ALTER TABLE `logged_in_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 --
 -- AUTO_INCREMENT for table `message`
 --
@@ -424,7 +438,7 @@ ALTER TABLE `message`
 -- AUTO_INCREMENT for table `room`
 --
 ALTER TABLE `room`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 --
 -- AUTO_INCREMENT for table `user`
 --
@@ -461,6 +475,12 @@ ALTER TABLE `logged_in_user`
 ALTER TABLE `message`
   ADD CONSTRAINT `fk_room_message` FOREIGN KEY (`room_id`) REFERENCES `room` (`id`),
   ADD CONSTRAINT `fk_user_message` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+--
+-- Constraints for table `room`
+--
+ALTER TABLE `room`
+  ADD CONSTRAINT `fk_user_id_created_room` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
