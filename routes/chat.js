@@ -4,7 +4,7 @@ var express = require('express'),
     db      = require('../db');
 var app = module.exports = express.Router();
 function getPrivateRoom(user_one, user_two, done){
-  db.get().query('SELECT id FROM room WHERE is_private = 1 AND id IN(SELECT room_id FROM logged_in_user WHERE user_id = ? AND room_id IN(SELECT room_id FROM logged_in_user WHERE user_id = ?))', [user_one, user_two], function(err, rows, fields){
+  db.get().query('SELECT id, is_private FROM room WHERE is_private = 1 AND id IN(SELECT room_id FROM logged_in_user WHERE user_id = ? AND room_id IN(SELECT room_id FROM logged_in_user WHERE user_id = ?))', [user_one, user_two], function(err, rows, fields){
     if(err) throw err;
     done(rows);
   });
@@ -25,8 +25,8 @@ function getRoom(room_id, done){
         done(rows[0]);
     });
 }
-function getAllRooms(done){
-  db.get().query('SELECT * FROM room', function(err, rows){
+function getAllRoomOfUser(user_id, done){
+  db.get().query('SELECT * FROM room WHERE id IN(SELECT room_id FROM logged_in_user WHERE user_id = ?)', [user_id], function(err, rows){
     if (err) throw err;
     done(rows);
   });
@@ -45,8 +45,8 @@ function getAllMessages(room_id, done){
 }
 
 //**************Common**************
-app.get('/api/chat/rooms', function(req, res) {
-  getAllRooms(function(result) {
+app.get('/api/chat/rooms/:user_id', function(req, res) {
+  getAllRoomOfUser(req.params.user_id, function(result) {
       res.status(200).send(result);
   });
 });
@@ -57,6 +57,31 @@ app.get('/api/chat/get_messages/:room_id', function(req, res) {
   }
   getAllMessages(req.params.room_id ,function(result) {
       res.status(200).send(result);
+  });
+});
+
+app.post('/api/chat/send_message', function(req, res){
+  var currentTime = new Date();
+  var room_id = req.body.room_id;
+  var user_id = req.body.user_id;
+  var to_user_id = req.body.to_user_id;
+  var text = req.body.text;
+  if(!room_id || !user_id || !to_user_id || !text){
+    return res.status(400).send("Not enough info for a message");
+  }
+  db.get().query('UPDATE room SET latest_message = ?, latest_time = ? WHERE id = ?', [text, currentTime.getTime(), room_id], function(err, result){
+    if(err) throw err;
+  });
+  var message = {
+    room_id: room_id,
+    text: text,
+    user_id: user_id,
+    to_user_id: to_user_id,
+    time_stamp: currentTime.getTime()
+  };
+  db.get().query('INSERT INTO message SET ?', [message], function(subErr, subRes){
+    if (subErr) throw subErr;
+    res.status(200).send(subRes);
   });
 });
 //***********************Common***********************
@@ -99,39 +124,24 @@ app.post('/api/chat/create_private_group', function(req, res) {
     db.get().query('INSERT INTO logged_in_user SET room_id = ?, user_id = ?', [result.insertId,user_two_id], function(subErr, resultSub1){
         if (subErr) throw subErr;
     });
-    res.status(200).send(result);
-  });
-});
-
-app.post('/api/chat/send_to_private_group', function(req, res){
-  var currentTime = new Date();
-  var room_id = req.body.room_id;
-  var user_id = req.body.user_id;
-  var to_user_id = req.body.to_user_id;
-  var text = req.body.text;
-  if(!room_id || !user_id || !to_user_id || !text){
-    return res.status(400).send("Not enough info for a message private");
-  }
-  db.get().query('UPDATE room SET latest_message = ?, latest_time = ? WHERE id = ?', [text, currentTime.getTime(), room_id], function(err, result){
-    if(err) throw err;
-  });
-  var message = {
-    room_id: room_id,
-    text: text,
-    user_id: user_id,
-    to_user_id: to_user_id,
-    time_stamp: currentTime.getTime()
-  };
-  db.get().query('INSERT INTO message SET ?', [message], function(subErr, subRes){
-    if (subErr) throw subErr;
-    res.status(200).send(subRes);
+    getRoom(result.insertId, function(newRoomResult){
+      res.status(200).send(newRoomResult);
+    });
   });
 });
 
 //Khi nguoi dung nhan vao Danh Sach Ban Be, mo cua so chat
 app.get('/api/chat/get_room/:user_one/:user_two', function(req, res){
   getPrivateRoom(req.params.user_one, req.params.user_two, function(result){
-    res.status(200).send(result[0]);
+    if(result[0]){
+      res.status(200).send(result[0]);
+    }else{
+      var roomEmpty = {
+        id: -1,
+        is_private: 0
+      }
+      res.status(200).send(roomEmpty);
+    }
   });
 });
 //*************************************Private chat*************************************
